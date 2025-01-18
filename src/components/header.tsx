@@ -14,7 +14,7 @@ const styles = {
     backgroundColor: '#D9D9D9',
     color: 'white',
     padding: '10px 20px',
-    textAlign: 'right' as 'right',
+    textAlign: 'left'
   },
 };
 
