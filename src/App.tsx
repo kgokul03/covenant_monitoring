@@ -20,6 +20,8 @@ import {
   TableRow,
   Paper,
   Box,
+ 
+
 } from "@mui/material";
 import { Calendar, momentLocalizer , Views} from "react-big-calendar";
 import moment from "moment";
@@ -322,7 +324,7 @@ const App: React.FC = () => {
       </Grid>
 
       {/* Modal for Data */}
-      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}  maxWidth="lg" fullWidth>
+      <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)}  maxWidth="xl" fullWidth>
         <DialogTitle style={{ fontWeight: "bold" }}>Event Details </DialogTitle>
         <DialogContent>
         {jsonData && (
@@ -331,7 +333,7 @@ const App: React.FC = () => {
             <TableHead>
               <TableRow>
                 {["Issuer", "Syndicate Agent", "Date", "Event Type", "Comment", "Is Complaint"].map((heading) => (
-                  <TableCell key={heading} style={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
+                  <TableCell align="center" key={heading} style={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
                     {heading}
                   </TableCell>
                 ))}
@@ -341,16 +343,28 @@ const App: React.FC = () => {
               <TableRow>
                 {["issuer","borrower", "date", "eventType", "comment", "isComplaint"].map((key) => (
                   <TableCell key={key}>
-                    <input
-                      type="text"
+                    <textarea
+                      
                       value={jsonData[key] || ""}
                       onChange={(e) => setJsonData({ ...jsonData, [key]: e.target.value })}
                       style={{
+                        // width: "100%",
+                        // padding: "5px",
+                        // border: "1px solid #ccc",
+                        // borderRadius: "4px",
+                        // boxSizing: "border-box",
                         width: "100%",
-                        padding: "5px",
+                        padding: "10px",
                         border: "1px solid #ccc",
                         borderRadius: "4px",
+                        wordWrap: "break-word",  // Ensure text wraps properly
+                        whiteSpace: "normal", 
+                        minHeight: "50px",  // Ensure enough space
                         boxSizing: "border-box",
+                        overflowWrap: "break-word", 
+                        height: "150px",  // Set the fixed height
+                        resize: "none",   // Prevent resizing
+                        overflowY: "auto" // Enable scrolling inside if content exceeds
                       }}
                     />
                   </TableCell>
@@ -381,16 +395,20 @@ const App: React.FC = () => {
       </Dialog>
 
       {/* Event Details Modal */}
-      <Dialog open={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} maxWidth="lg" fullWidth>
+      <Dialog open={isEventModalOpen} onClose={() => setIsEventModalOpen(false)} maxWidth="xl" fullWidth>
         <DialogTitle style={{ fontWeight: "bold" }}>Event Details</DialogTitle>
-        <DialogContent style={{ maxHeight: "100vh", overflowY: "auto" }}>
+        <DialogContent style={{ maxHeight: "80vh", overflowY: "auto" }}>
           {selectedEvent && (
-            <TableContainer component={Paper} style={{ marginBottom: "20px" , maxHeight: "100vh", overflowY: "auto", textAlign: "center"}}>
+            <TableContainer component={Paper} style={{ marginBottom: "20px" , maxHeight: "70vh", overflowY: "auto", textAlign: "center",maxWidth: "100%",  // Fit within the modal width
+            overflowX: "auto",}}>
               <Table>
-                <TableHead>
+                <TableHead style={{textAlign:"center"}}>
                   <TableRow>
                     {["Issuer","Syndicate Agent", "Date", "Event Type", "Comment", "Is Complaint"].map((heading) => (
-                      <TableCell key={heading} style={{ fontWeight: "bold", backgroundColor: "#f5f5f5" }}>
+                      <TableCell  align="center" key={heading} style={{ fontWeight: "bold", backgroundColor: "#f5f5f5",
+                      wordWrap: "break-word",
+              whiteSpace: "normal",  // Allow content to wrap
+              padding: "15px" }}>
                         {heading}
                       </TableCell>
                     ))}
@@ -401,19 +419,29 @@ const App: React.FC = () => {
                     
                     {/* Editable fields */}
                     {["title","borrower", "date", "eventType", "comment", "isComplaint"].map((key) => (
-                      <TableCell key={key}>
-                        <input
+                      <TableCell  key={key} style = {{ whiteSpace: "normal !important", wordWrap: "break-word",overflowWrap: "break-word"}}>
+                        <textarea
+                         
+
                           readOnly
-                          type="text"
                           value={selectedEvent[key] || ""}
                           onChange={(e) =>
                             setSelectedEvent({ ...selectedEvent, [key]: e.target.value })
                           }
                           style={{
                             width: "100%",
-                            padding: "5px",
+                            padding: "10px",
                             border: "1px solid #ccc",
                             borderRadius: "4px",
+                            wordWrap: "break-word",  // Ensure text wraps properly
+                            whiteSpace: "normal", 
+                            minHeight: "50px",  // Ensure enough space
+                            boxSizing: "border-box",
+                            overflowWrap: "break-word", 
+                            height: "150px",  // Set the fixed height
+                            resize: "none",   // Prevent resizing
+                            overflowY: "auto" // Enable scrolling inside if content exceeds
+                          
                           }}
                         />
                       </TableCell>
