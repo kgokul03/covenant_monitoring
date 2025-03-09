@@ -9,7 +9,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-app = Flask(__name__,static_folder=r'F:\Bits\Sem 4\Project\Project\covenant_monitoring\build')
+app = Flask(__name__,static_folder=r'.\build')
 # MongoDB connection string
 uri = "mongodb+srv://admin:rootpassword@gokul.3p5ox.mongodb.net/?retryWrites=true&w=majority&appName=gokul"
 client = MongoClient(uri, server_api=ServerApi('1'))
