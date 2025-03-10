@@ -23,6 +23,9 @@ import {
  
 
 } from "@mui/material";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+
 import { Calendar, momentLocalizer , Views} from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -47,6 +50,7 @@ const App: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isUploading, setIsUploading] = useState(false); 
 
   const handleDownloadPDF = () => {
     setActiveTab("reports"); // Set "Reports" as the active tab
@@ -127,22 +131,29 @@ const App: React.FC = () => {
 
   const handleFileUpload = () => {
     if (!selectedFile) return;
+    setIsUploading(true);
     const formData = new FormData();
     formData.append("pdf", selectedFile);
-
+  
     fetch("http://127.0.0.1:5000/api/upload-pdf", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data.message);
-        setJsonData(data.data);
+        console.log("Response Data:", data);
+        if (Array.isArray(data.data)) {
+          setJsonData(data.data); // Store as an array
+        } else {
+          console.error("Expected an array but received:", data.data);
+          setJsonData([]); // Reset in case of unexpected response
+        }
         setIsModalOpen(true);
-       
       })
-      .catch((error) => console.error("Error uploading file:", error));
+      .catch((error) => console.error("Error uploading file:", error))
+      .finally(() => setIsUploading(false));
   };
+  
 
   const handleConfirm = () => {
     fetch("http://127.0.0.1:5000/api/save-data", {
@@ -160,6 +171,10 @@ const App: React.FC = () => {
 
   return (
     <div>
+      <Backdrop open={isUploading} style={{ zIndex: 1300, color: "#fff" }}>
+  <CircularProgress color="inherit" />
+</Backdrop>
+
       {/* Top Bar */}
       <AppBar position="static">
         <Toolbar>
@@ -340,37 +355,46 @@ const App: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              <TableRow>
-                {["issuer","borrower", "date", "eventType", "comment", "isComplaint"].map((key) => (
-                  <TableCell key={key}>
-                    <textarea
-                      
-                      value={jsonData[key] || ""}
-                      onChange={(e) => setJsonData({ ...jsonData, [key]: e.target.value })}
-                      style={{
-                        // width: "100%",
-                        // padding: "5px",
-                        // border: "1px solid #ccc",
-                        // borderRadius: "4px",
-                        // boxSizing: "border-box",
-                        width: "100%",
-                        padding: "10px",
-                        border: "1px solid #ccc",
-                        borderRadius: "4px",
-                        wordWrap: "break-word",  // Ensure text wraps properly
-                        whiteSpace: "normal", 
-                        minHeight: "50px",  // Ensure enough space
-                        boxSizing: "border-box",
-                        overflowWrap: "break-word", 
-                        height: "150px",  // Set the fixed height
-                        resize: "none",   // Prevent resizing
-                        overflowY: "auto" // Enable scrolling inside if content exceeds
-                      }}
-                    />
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableBody>
+  {jsonData.length > 0 ? (
+    jsonData.map((row, index) => (
+      <TableRow key={index}>
+        {["issuer", "borrower", "date", "eventType", "comment", "isComplaint"].map((key) => (
+          <TableCell key={key}>
+            <textarea
+              value={row[key] || ""}
+              onChange={(e) => {
+                const updatedData = [...jsonData];
+                updatedData[index] = { ...updatedData[index], [key]: e.target.value };
+                setJsonData(updatedData);
+              }}
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #ccc",
+                borderRadius: "4px",
+                wordWrap: "break-word",
+                whiteSpace: "normal",
+                minHeight: "50px",
+                boxSizing: "border-box",
+                overflowWrap: "break-word",
+                height: "150px",
+                resize: "none",
+                overflowY: "auto",
+              }}
+            />
+          </TableCell>
+        ))}
+      </TableRow>
+    ))
+  ) : (
+    <TableRow>
+      <TableCell colSpan={6} align="center">
+        No data available.
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
+
           </Table>
         </TableContainer>)}
         </DialogContent>
